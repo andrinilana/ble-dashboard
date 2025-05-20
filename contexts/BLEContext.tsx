@@ -17,6 +17,7 @@ import { startActivityAsync, ActivityAction } from 'expo-intent-launcher';
 
 interface BluetoothContextProps {
 	receivedData: string;
+	bluetoothEnabled: boolean;
 }
 
 const BluetoothContext = createContext<BluetoothContextProps | undefined>(undefined);
@@ -38,6 +39,7 @@ const manager = new BleManager();
 export const BluetoothProvider: React.FC<BluetoothProviderProps> = ({ children }) => {
 	let monitorSubscription: Subscription;
 	const [receivedData, setReceivedData] = useState<string>('');
+	const [bluetoothEnabled, setBluetoothEnabled] = useState<boolean>(false);
 	const [deviceId, setDeviceId] = useState<string | null>(null);
 
 	const requestBluetoothPermissions = async () => {
@@ -77,6 +79,8 @@ export const BluetoothProvider: React.FC<BluetoothProviderProps> = ({ children }
 				case State.PoweredOn:
 					console.log('Bluetooth is powered on');
 
+					setBluetoothEnabled(true);
+
 					if (deviceId) {
 						// Attempt to reconnect to the device
 						// attemptReconnect(deviceId);
@@ -85,6 +89,8 @@ export const BluetoothProvider: React.FC<BluetoothProviderProps> = ({ children }
 					break;
 				case State.PoweredOff:
 					console.log('Bluetooth is powered off');
+
+					setBluetoothEnabled(false);
 
 					// Open bluetooth settings
 					startActivityAsync(ActivityAction.BLUETOOTH_SETTINGS);
@@ -190,7 +196,7 @@ export const BluetoothProvider: React.FC<BluetoothProviderProps> = ({ children }
 	}, []);
 
 	return (
-		<BluetoothContext.Provider value={{receivedData,}}>
+		<BluetoothContext.Provider value={{receivedData, bluetoothEnabled}}>
 			{children}
 		</BluetoothContext.Provider>
 	);
