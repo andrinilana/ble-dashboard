@@ -1,18 +1,16 @@
 import React, { useEffect } from "react";
-import { StyleSheet, View, Alert } from "react-native";
-import { ThemedView } from "@/components/ThemedView";
-import { ThemedButton } from "@/components/ThemedButton";
-import { ThemedText } from "@/components/ThemedText";
+import { StyleSheet, Alert } from "react-native";
+import { View, Text } from "@/components/Themed";
 import { useBluetooth } from "@/contexts/BLEContext";
 
 export default function HomeScreen() {
     const { receivedData } = useBluetooth();
 
     return (
-        <ThemedView style={styles.container}>
-            <ThemedText>Received data : </ThemedText>
-            <ThemedText>{receivedData}</ThemedText>
-        </ThemedView>
+        <View style={styles.container}>
+            <Text>Received data : </Text>
+            <Text>{receivedData}</Text>
+        </View>
     );
 }
 

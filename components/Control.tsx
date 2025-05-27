@@ -1,9 +1,9 @@
 import React, { useState, useCallback, useEffect } from "react";
 import { View, StyleSheet, useColorScheme, Alert, GestureResponderEvent, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { ThemedButton } from "./ThemedButton";
-import { ThemedText } from "./ThemedText";
-import { useBluetooth } from "@/contexts/BluetoothContext";
+// import { ThemedButton } from "./ThemedButton";
+// import { ThemedText } from "./ThemedText";
+import { useBluetooth } from "@/contexts/BLEContext";
 
 const ArrowButton = ({ direction, onPress, isDarkMode }: { direction: 'up' | 'back' | 'forward' | 'down', onPress: ((event: GestureResponderEvent) => void) | undefined, isDarkMode: boolean }) => (
     <TouchableOpacity activeOpacity={0.8} onPress={onPress}>

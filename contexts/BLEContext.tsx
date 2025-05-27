@@ -151,24 +151,24 @@ export const BluetoothProvider: React.FC<BluetoothProviderProps> = ({ children }
 
 	useEffect(() => {
 		const startBLE = async (): Promise<void> => {
-			manager.startDeviceScan(null, null, async (error: unknown, device: Device | null) => {
+			manager.startDeviceScan(null, null, async (error: unknown, foundDevice: Device | null) => {
 				if (error) {
 					console.error('Scan error:', error);
 					return;
 				}
 
-				if (device?.name === BLE_DEVICE_NAME) {
+				if (foundDevice?.name === BLE_DEVICE_NAME) {
 					console.log(`Found device: ${BLE_DEVICE_NAME}`);
 					manager.stopDeviceScan();
 
 					try {
-						const connectedDevice = await device.connect();
-						await connectedDevice.discoverAllServicesAndCharacteristics();
+						const device = await foundDevice.connect();
+						await device.discoverAllServicesAndCharacteristics();
 
-						setDeviceId(connectedDevice.id);
-						console.log('Connected to device:', connectedDevice.name);
-						monitorDisconnect(connectedDevice);
-						setupNotification(connectedDevice);
+						setDeviceId(device.id);
+						console.log('Connected to device:', device.name);
+						monitorDisconnect(device);
+						setupNotification(device);
 					} catch (err) {
 						console.error('Connection error:', err);
 					}
