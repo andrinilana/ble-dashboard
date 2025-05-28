@@ -15,8 +15,11 @@ import { Buffer } from 'buffer';
 import { CHARACTERISTIC_UUID, BLE_DEVICE_NAME, SERVICE_UUID } from '@/constants/Ble';
 import { startActivityAsync, ActivityAction } from 'expo-intent-launcher';
 
+interface ReceivedDataType {
+	[key: string]: number | string;
+}
 interface BluetoothContextProps {
-	receivedData: string;
+	receivedData: ReceivedDataType | null;
 	bluetoothEnabled: boolean;
 }
 
@@ -38,7 +41,7 @@ const manager = new BleManager();
 
 export const BluetoothProvider: React.FC<BluetoothProviderProps> = ({ children }) => {
 	let monitorSubscription: Subscription;
-	const [receivedData, setReceivedData] = useState<string>('');
+	const [receivedData, setReceivedData] = useState<ReceivedDataType | null>(null);
 	const [bluetoothEnabled, setBluetoothEnabled] = useState<boolean>(false);
 	const [deviceId, setDeviceId] = useState<string | null>(null);
 
@@ -115,8 +118,17 @@ export const BluetoothProvider: React.FC<BluetoothProviderProps> = ({ children }
 
 				if (characteristic?.value) {
 					const decoded = Buffer.from(characteristic.value, 'base64').toString('utf8');
+
 					console.log('Received:', decoded);
-					setReceivedData(decoded);
+
+					const data = Object.fromEntries(
+						decoded.split(";").map((pair: string) => {
+							const [key, value] = pair.split(":");
+							return [key.toLowerCase(), value];
+						})
+					);
+
+					setReceivedData(data);
 				}
 			}
 		);
