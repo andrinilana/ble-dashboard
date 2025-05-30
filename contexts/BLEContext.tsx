@@ -16,8 +16,9 @@ import { CHARACTERISTIC_UUID, BLE_DEVICE_NAME, SERVICE_UUID } from '@/constants/
 import { startActivityAsync, ActivityAction } from 'expo-intent-launcher';
 
 interface ReceivedDataType {
-	[key: string]: number | string;
-}
+	temperature: number;
+	resistance: number;
+};
 interface BluetoothContextProps {
 	receivedData: ReceivedDataType | null;
 	bluetoothEnabled: boolean;
@@ -106,6 +107,27 @@ export const BluetoothProvider: React.FC<BluetoothProviderProps> = ({ children }
 		return () => subscription?.remove();
 	}, [manager, deviceId]);
 
+	const convertReceivedData = (data: string): ReceivedDataType => {
+		const entries = data.split(';').map((pair: string) => {
+			const [key, value] = pair.split(':');
+			const parsedKey = key.toLowerCase();
+			const parsedValue = isNaN(Number(value)) ? value : Number(value);
+
+			switch (parsedKey) {
+				case 't':
+					return ['temperature', parsedValue];
+				case 'r':
+					return ['resistance', parsedValue];
+				default:
+					return [parsedKey, parsedValue];
+			}
+		});
+
+		const result = Object.fromEntries(entries);
+
+		return result as ReceivedDataType;
+	};
+
 	const setupNotification = (device: Device) => {
 		monitorSubscription = device.monitorCharacteristicForService(
 			SERVICE_UUID,
@@ -121,14 +143,7 @@ export const BluetoothProvider: React.FC<BluetoothProviderProps> = ({ children }
 
 					console.log('Received:', decoded);
 
-					const data = Object.fromEntries(
-						decoded.split(";").map((pair: string) => {
-							const [key, value] = pair.split(":");
-							return [key.toLowerCase(), value];
-						})
-					);
-
-					setReceivedData(data);
+					setReceivedData(convertReceivedData(decoded));
 				}
 			}
 		);
